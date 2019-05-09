@@ -1,7 +1,0 @@
-enableFeaturePreview('STABLE_PUBLISHING')
-
-include ":Core"
-include ":Java"
-include ":Android"
-include ":Log4j"
-include ":Logback"

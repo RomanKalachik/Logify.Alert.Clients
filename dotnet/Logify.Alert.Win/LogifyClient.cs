@@ -70,8 +70,8 @@ namespace DevExpress.Logify.Win {
 
             CompositeExceptionReportSender sender = new CompositeExceptionReportSender();
             sender.StopWhenFirstSuccess = true;
-            sender.Senders.Add(new ExternalProcessExceptionReportSender());
-            sender.Senders.Add(defaultSender);
+            //sender.Senders.Add(new ExternalProcessExceptionReportSender());
+            //sender.Senders.Add(defaultSender);
             sender.Senders.Add(new OfflineDirectoryExceptionReportSender());
             return sender;
         }

@@ -5,6 +5,19 @@ using NUnit.Framework;
 using DevExpress.Logify.Core.Internal;
 
 namespace DevExpress.Logify.Core.Tests {
+
+    [TestFixture]
+    public class RealTest
+    {
+        [Test]
+        public void TestSend()
+        {
+            LogifyAlert client = LogifyAlert.Instance;
+            client.OfflineReportsEnabled = true;
+            client.ApiKey = "test";
+            client.Send(new Exception());
+        }
+    }
     [TestFixture]
     public class DxLogifyClientTests {
         DxLogifyClient client;
@@ -17,6 +30,7 @@ namespace DevExpress.Logify.Core.Tests {
         public void TearDown() {
             this.client = null;
         }
+   
         [Test]
         public void ReportToDevExpressFileNameSpecified() {
             client.ReportToDevExpress("myLog", "exception.log", GetType().Assembly);

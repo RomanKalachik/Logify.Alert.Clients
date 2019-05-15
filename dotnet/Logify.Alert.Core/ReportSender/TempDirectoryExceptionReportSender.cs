@@ -13,7 +13,7 @@ namespace DevExpress.Logify.Core.Internal
 {
     public class ErrorReporter
     {
-        public static string CredentailsFileName { get; set; } // @"C:\Users\Roman\Downloads\ApportoCloudDrive-65ae94c85266.json"
+        public static string CredentailsFileName { get; set; }
         public static string ProjectID { get; set; }
         public static string ProjectVersion { get; set; }
 

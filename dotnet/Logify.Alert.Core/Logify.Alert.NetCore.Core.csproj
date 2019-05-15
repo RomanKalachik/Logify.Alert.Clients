@@ -53,6 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Clouderrorreporting.v1beta1" Version="1.40.0.1574" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.0" />
     <PackageReference Include="System.ComponentModel" Version="4.0.1" />

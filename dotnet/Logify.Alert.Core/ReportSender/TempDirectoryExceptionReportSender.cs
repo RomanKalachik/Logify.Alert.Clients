@@ -1,112 +1,66 @@
-﻿//using Google.Apis.Auth.OAuth2;
-//using Google.Apis.Gmail.v1;
-//using Google.Apis.Gmail.v1.Data;
-//using Google.Apis.Services;
-//using Google.Apis.Util.Store;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Clouderrorreporting.v1beta1;
+using Google.Apis.Clouderrorreporting.v1beta1.Data;
+using Google.Apis.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Mail;
-using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using static Google.Apis.Clouderrorreporting.v1beta1.ProjectsResource.EventsResource;
 
 namespace DevExpress.Logify.Core.Internal
 {
-    //public class GmailSender
-    //{
-    //    static string ApplicationName = "error reporter";
-    //    static GmailSender instance;
-    //    static string[] Scopes = { GmailService.Scope.GmailSend };
-    //    UserCredential credential;
-    //    GmailService service;
+    public class ErrorReporter
+    {
+        public static string CredentailsFileName { get; set; } // @"C:\Users\Roman\Downloads\ApportoCloudDrive-65ae94c85266.json"
+        public static string ProjectID { get; set; }
+        public static string ProjectVersion { get; set; }
 
-    //    public void Init()
-    //    {
-    //        using (var stream =
-    //            new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
-    //        {
-    //            string credPath = "token.json";
-    //            credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-    //                GoogleClientSecrets.Load(stream).Secrets,
-    //                Scopes,
-    //                "user",
-    //                CancellationToken.None,
-    //                new FileDataStore(credPath, true)).Result;
-    //            Console.WriteLine("Credential file saved to: " + credPath);
-    //            service = new GmailService(new BaseClientService.Initializer()
-    //            {
-    //                HttpClientInitializer = credential,
-    //                ApplicationName = ApplicationName,
-    //            });
-    //        }
-    //    }
+        private static ClouderrorreportingService CreateErrorReportingClient()
+        {
+            GoogleCredential credential = GoogleCredential.FromFile(CredentailsFileName);
+            credential = credential.CreateScoped(ClouderrorreportingService.Scope.CloudPlatform);
+            ClouderrorreportingService service = new ClouderrorreportingService(new BaseClientService.Initializer
+            {
+                HttpClientInitializer = credential,
+            });
+            return service;
+        }
 
-    //    public void SendIt(string message)
-    //    {
-    //        var mailMessage = new System.Net.Mail.MailMessage();
-    //        mailMessage.From = new System.Net.Mail.MailAddress("apportodriveerrors@e.e");
-    //        mailMessage.To.Add("romankalachik@gmail.com");
-    //        mailMessage.Subject = "error report";
-    //        mailMessage.Body = message;
-    //        mailMessage.IsBodyHtml = false;
-    //        MemoryStream ms = new MemoryStream();
-    //        ToEMLStream(mailMessage, ms);
-    //        ms.Flush();
-    //        ms.Position = 0;
-    //        StreamReader reader = new StreamReader(ms);
-    //        string text = reader.ReadToEnd();
-    //        ms.Dispose();
-    //        var result = service.Users.Messages.Send(new Message
-    //        { 
-    //            Raw = text,
-    //        }, "me").Execute();
-    //        Console.WriteLine($"Message ID {result.Id} sent.");
-    //    }
-    //    public static void ToEMLStream(MailMessage msg, Stream str)
-    //    {
-    //        using (var client = new SmtpClient())
-    //        {
-    //            var id = Guid.NewGuid();
+        static ClouderrorreportingService service;
+        /// <summary>
+        /// Creates a <seealso cref="ReportRequest"/> from a given exception.
+        /// </summary>
+        private static ReportRequest CreateReportRequest(LogifyClientExceptionReport report)
+        {
+            if (service == null)
+                service = CreateErrorReportingClient();
+            string projectId = ProjectID;
 
-    //            var tempFolder = Path.Combine(Path.GetTempPath(), Assembly.GetExecutingAssembly().GetName().Name);
+            string formattedProjectId = $"projects/{projectId}";
 
-    //            tempFolder = Path.Combine(tempFolder, "MailMessageToEMLTemp");
+            ServiceContext serviceContext = new ServiceContext()
+            {
+                Service = "service_account",
+                Version = ProjectVersion,
+            };
+            ReportedErrorEvent errorEvent = new ReportedErrorEvent()
+            {
+                Message = report.ReportString, 
+                ServiceContext = serviceContext, Context = new ErrorContext() { ReportLocation = new SourceLocation(  ) { FilePath="test", LineNumber=1,  FunctionName="test"} }
+            };
+            return new ReportRequest(service, errorEvent, formattedProjectId);
+        }
 
-    //            tempFolder = Path.Combine(tempFolder, id.ToString());
+        public static void SendReport(LogifyClientExceptionReport report)
+        {
+            ReportRequest request = CreateReportRequest(report);
+            request.Execute();
+        }
+    }
 
-    //            if (!Directory.Exists(tempFolder))
-    //            {
-    //                Directory.CreateDirectory(tempFolder);
-    //            }
 
-    //            client.UseDefaultCredentials = true;
-    //            client.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
-    //            client.PickupDirectoryLocation = tempFolder;
-    //            client.Send(msg);
-
-    //            var filePath = Directory.GetFiles(tempFolder)[0];
-
-    //            using (var fs = new FileStream(filePath, FileMode.Open))
-    //            {
-    //                fs.CopyTo(str);
-    //            }
-
-    //            if (Directory.Exists(tempFolder))
-    //            {
-    //                Directory.Delete(tempFolder, true);
-    //            }
-    //        }
-    //    }
-
-    //    public static GmailSender Default {
-    //        get {
-    //            if (instance == null) { instance = new GmailSender(); instance.Init(); }
-    //            return instance;
-    //        }
-    //    }
-    //}
     public class OfflineDirectoryExceptionReportSender : ExceptionReportSenderSkeleton, IOfflineDirectoryExceptionReportSender
     {
         internal const string TempFileNameExtension = "alert";
@@ -170,23 +124,23 @@ namespace DevExpress.Logify.Core.Internal
         {
             try
             {
-                if (!Directory.Exists(DirectoryName))
-                    Directory.CreateDirectory(DirectoryName);
+                //if (!Directory.Exists(DirectoryName))
+                //    Directory.CreateDirectory(DirectoryName);
 
-                if (!Directory.Exists(DirectoryName))
-                    return false;
+                //if (!Directory.Exists(DirectoryName))
+                //    return false;
 
                 lock (typeof(OfflineDirectoryExceptionReportSender))
                 {
-                    EnsureHaveSpace();
-                    string fileName = CreateTempFileName(DirectoryName);
-                    if (String.IsNullOrEmpty(fileName))
-                        return false;
+                    //EnsureHaveSpace();
+                    //string fileName = CreateTempFileName(DirectoryName);
+                    //if (String.IsNullOrEmpty(fileName))
+                    //    return false;
 
-                    Encoding encoding = Encoding;
-                    if (encoding == null)
-                        encoding = Encoding.UTF8;
-                    //GmailSender.Default.SendIt(report.ReportString);
+                    //Encoding encoding = Encoding;
+                    //if (encoding == null)
+                    //    encoding = Encoding.UTF8;
+                    ErrorReporter.SendReport(report);
                     return true;
                 }
             }

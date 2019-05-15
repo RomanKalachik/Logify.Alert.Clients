@@ -48,6 +48,11 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+ <ItemGroup>
+    <PackageReference Include="Google.Apis.Clouderrorreporting.v1beta1" Version="1.40.0.1574" />
+  </ItemGroup>
+
+
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>

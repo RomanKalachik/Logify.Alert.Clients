@@ -293,10 +293,10 @@ namespace DevExpress.Logify.Core {
             logifyAppInfoCollector.UserId = this.UserId;
 
             collectors.Insert(0, logifyAppInfoCollector);
-            collectors.Insert(0, new LogifyReportGenerationDateTimeCollector());
-            if (this.AllowRemoteConfiguration)
-                collectors.Insert(0, new LogifyHardwareIdCollector());
-            collectors.Insert(0, new LogifyProtocolVersionCollector());
+            //collectors.Insert(0, new LogifyReportGenerationDateTimeCollector());
+            //if (this.AllowRemoteConfiguration)
+            //    collectors.Insert(0, new LogifyHardwareIdCollector());
+            //collectors.Insert(0, new LogifyProtocolVersionCollector());
 
             collectors.Add(new ExceptionObjectInfoCollector(context, CreateNormalizedStackCollector()));
             collectors.Add(new CustomDataCollector(this.CustomData.Clone(), context.AdditionalCustomData));

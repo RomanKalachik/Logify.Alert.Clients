@@ -47,7 +47,7 @@ namespace DevExpress.Logify.Core.Internal
             };
             ReportedErrorEvent errorEvent = new ReportedErrorEvent()
             {
-                Message = report.ReportString, 
+                Message = report.ReportString,
                 ServiceContext = serviceContext, Context = new ErrorContext() { ReportLocation = new SourceLocation(  ) { FilePath="test", LineNumber=1,  FunctionName="test"} }
             };
             return new ReportRequest(service, errorEvent, formattedProjectId);
